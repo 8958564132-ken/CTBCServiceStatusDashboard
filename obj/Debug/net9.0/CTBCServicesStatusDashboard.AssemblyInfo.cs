@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CTBCServicesStatusDashboard")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+91c17cd1e843e71c1cb0bebd40af1afe4cb9c2b4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9006fa6c26a3cc8c4293167fbe0e1b64a55bf24c")]
 [assembly: System.Reflection.AssemblyProductAttribute("CTBCServicesStatusDashboard")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CTBCServicesStatusDashboard")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
