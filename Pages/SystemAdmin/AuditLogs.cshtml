@@ -1,0 +1,644 @@
+@page
+@model AuditLogsModel
+@{
+    ViewData["Title"] = "Audit Logs";
+    Layout = "_SystemAdminLayout";
+}
+
+<link rel="stylesheet" href="~/css/admin/audit-logs.css" />
+
+<div class="audit-logs-container">
+    <!-- Header -->
+    <div class="header-section">
+        <div class="header-title">
+            <h1><i class="fas fa-clipboard-list"></i> Audit Logs</h1>
+            <p>Track all system activities, user maintenance, parameter changes, and URL management</p>
+        </div>
+        <form method="post" asp-page-handler="Export">
+            <button type="submit" class="export-btn">
+                <i class="fas fa-download"></i> Export Logs
+            </button>
+        </form>
+    </div>
+
+    <!-- Success Message -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon total">
+                <i class="fas fa-database"></i>
+            </div>
+            <div class="stat-details">
+                <h3>Total Logs</h3>
+                <div class="stat-value">@Model.Summary.TotalLogs</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon activity">
+                <i class="fas fa-user-clock"></i>
+            </div>
+            <div class="stat-details">
+                <h3>User Activity</h3>
+                <div class="stat-value">@Model.Summary.ActivityLogs</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon maintenance">
+                <i class="fas fa-tools"></i>
+            </div>
+            <div class="stat-details">
+                <h3>Maintenance</h3>
+                <div class="stat-value">@Model.Summary.MaintenanceLogs</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon parameter">
+                <i class="fas fa-sliders-h"></i>
+            </div>
+            <div class="stat-details">
+                <h3>Parameters</h3>
+                <div class="stat-value">@Model.Summary.ParameterLogs</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <form method="get">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label>Search</label>
+                    <input type="text" 
+                           name="SearchTerm" 
+                           class="filter-control" 
+                           placeholder="Search by user, IP, details..."
+                           value="@Model.SearchTerm" />
+                </div>
+                
+                <div class="filter-group">
+                    <label>User</label>
+                    <select name="UserFilter" class="filter-control">
+                        <option value="">All Users</option>
+                        @if (Model.UniqueUsers != null)
+                        {
+                            @foreach (var user in Model.UniqueUsers)
+                            {
+                                <option value="@user" selected="@(Model.UserFilter == user)">@user</option>
+                            }
+                        }
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Action</label>
+                    <select name="ActionFilter" class="filter-control">
+                        <option value="">All Actions</option>
+                        @if (Model.UniqueActions != null)
+                        {
+                            @foreach (var action in Model.UniqueActions)
+                            {
+                                <option value="@action" selected="@(Model.ActionFilter == action)">@action</option>
+                            }
+                        }
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select name="StatusFilter" class="filter-control">
+                        <option value="">All Status</option>
+                        <option value="success" selected="@(Model.StatusFilter == "success")">Success</option>
+                        <option value="failure" selected="@(Model.StatusFilter == "failure")">Failure</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Start Date</label>
+                    <input type="date" 
+                           name="StartDate" 
+                           class="filter-control" 
+                           value="@(Model.StartDate?.ToString("yyyy-MM-dd"))" />
+                </div>
+                
+                <div class="filter-group">
+                    <label>End Date</label>
+                    <input type="date" 
+                           name="EndDate" 
+                           class="filter-control" 
+                           value="@(Model.EndDate?.ToString("yyyy-MM-dd"))" />
+                </div>
+                
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Apply
+                    </button>
+                    <a href="@Url.Page("AuditLogs", "ClearFilters")" class="btn btn-warning">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-section">
+        <div class="tabs-header">
+            <button class="tab-btn active" onclick="showTab('activity')">
+                <i class="fas fa-user-clock"></i> User Activity
+            </button>
+            <button class="tab-btn" onclick="showTab('maintenance')">
+                <i class="fas fa-tools"></i> User Maintenance
+            </button>
+            <button class="tab-btn" onclick="showTab('url')">
+                <i class="fas fa-link"></i> URL Management
+            </button>
+            <button class="tab-btn" onclick="showTab('parameter')">
+                <i class="fas fa-sliders-h"></i> Parameter Changes
+            </button>
+        </div>
+
+        <!-- Activity Logs Tab -->
+        <div id="activity-tab" class="tab-content active">
+            <div class="table-responsive">
+                @if (Model.ActivityLogs != null && Model.ActivityLogs.Any())
+                {
+                    <table class="audit-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>User</th>
+                                <th>Role</th>
+                                <th>Activity</th>
+                                <th>Status</th>
+                                <th>IP Address</th>
+                                <th>Details</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var log in Model.ActivityLogs.Take(20))
+                            {
+                                <tr>
+                                    <td>@log.Date</td>
+                                    <td>@log.Time</td>
+                                    <td>@log.User</td>
+                                    <td>@log.UserRole</td>
+                                    <td>
+                                        <span class="action-badge @(log.Action?.ToLower().Replace(" ", "-") ?? "unknown")">
+                                            @(log.Action ?? "Unknown")
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge @(log.Status ?? "unknown")">
+                                            @(log.Status == "success" ? "Success" : "Failure")
+                                        </span>
+                                    </td>
+                                    <td>@log.IpAddress</td>
+                                    <td>@log.Details</td>
+                                    <td>
+                                        <button class="view-btn" onclick="viewDetails(@log.Id, 'activity')">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    
+                    <div class="pagination">
+                        <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data">
+                        <i class="fas fa-info-circle"></i>
+                        <h3>No Activity Logs Found</h3>
+                        <p>Try adjusting your filters.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Maintenance Logs Tab (User Management) -->
+        <div id="maintenance-tab" class="tab-content">
+            <div class="table-responsive">
+                @if (Model.MaintenanceLogs != null && Model.MaintenanceLogs.Any())
+                {
+                    <table class="audit-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Initiator</th>
+                                <th>Target User</th>
+                                <th>Action</th>
+                                <th>Field Changed</th>
+                                <th>Old Value</th>
+                                <th>New Value</th>
+                                <th>IP Address</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var log in Model.MaintenanceLogs.Take(20))
+                            {
+                                <tr>
+                                    <td>@log.Date</td>
+                                    <td>@log.Time</td>
+                                    <td>@log.InitiatingUser</td>
+                                    <td>@log.TargetUser</td>
+                                    <td>
+                                        <span class="action-badge @(log.ChangeType?.ToLower().Replace(" ", "-") ?? "unknown")">
+                                            @(log.ChangeType ?? "Unknown")
+                                        </span>
+                                    </td>
+                                    <td>@(log.FieldChanged ?? "-")</td>
+                                    <td>@(log.OldValue ?? "-")</td>
+                                    <td>@(log.NewValue ?? "-")</td>
+                                    <td>@log.IpAddress</td>
+                                    <td>
+                                        <button class="view-btn" onclick="viewDetails(@log.Id, 'maintenance')">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    
+                    <div class="pagination">
+                        <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data">
+                        <i class="fas fa-info-circle"></i>
+                        <h3>No Maintenance Logs Found</h3>
+                        <p>Try adjusting your filters.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- URL Management Logs Tab (NEW) -->
+        <div id="url-tab" class="tab-content">
+            <div class="table-responsive">
+                @if (Model.UrlLogs != null && Model.UrlLogs.Any())
+                {
+                    <table class="audit-table"> 
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>User</th>
+                                <th>Role</th>
+                                <th>Action</th>
+                                <th>URL Name</th>
+                                <th>Details</th>
+                                <th>IP Address</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var log in Model.UrlLogs.Take(20))
+                            {
+                                <tr>
+                                    <td>@log.Date</td>
+                                    <td>@log.Time</td>
+                                    <td>@log.User</td>
+                                    <td>@log.UserRole</td>
+                                    <td>
+                                        <span class="action-badge @(log.Action?.ToLower().Replace(" ", "-") ?? "unknown")">
+                                            @(log.Action ?? "Unknown")
+                                        </span>
+                                    </td>
+                                    <td><strong>@log.TargetUser</strong></td>
+                                    <td>@log.Details</td>
+                                    <td>@log.IpAddress</td>
+                                    <td>
+                                        <span class="status-badge @(log.Status ?? "unknown")">
+                                            @(log.Status == "success" ? "Success" : "Failure")
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="view-btn" onclick="viewDetails(@log.Id, 'url')">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    
+                    <div class="pagination">
+                        <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data">
+                        <i class="fas fa-info-circle"></i>
+                        <h3>No URL Management Logs Found</h3>
+                        <p>URL management activities will appear here when you add, edit, delete, or test URLs.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Parameter Logs Tab -->
+        <div id="parameter-tab" class="tab-content">
+            <div class="table-responsive">
+                @if (Model.ParameterLogs != null && Model.ParameterLogs.Any())
+                {
+                    <table class="audit-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>User</th>
+                                <th>Module</th>
+                                <th>Parameter</th>
+                                <th>Old Value</th>
+                                <th>New Value</th>
+                                <th>IP Address</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var log in Model.ParameterLogs.Take(20))
+                            {
+                                <tr>
+                                    <td>@log.Date</td>
+                                    <td>@log.Time</td>
+                                    <td>@log.User</td>
+                                    <td>@log.Module</td>
+                                    <td>@log.Parameter</td>
+                                    <td>@log.OldValue</td>
+                                    <td>@log.NewValue</td>
+                                    <td>@log.IpAddress</td>
+                                    <td>
+                                        <button class="view-btn" onclick="viewDetails(@log.Id, 'parameter')">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    
+                    <div class="pagination">
+                        <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data">
+                        <i class="fas fa-info-circle"></i>
+                        <h3>No Parameter Logs Found</h3>
+                        <p>Try adjusting your filters.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> Log Details</h3>
+                <button type="button" class="close" onclick="hideModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Dynamic content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="hideModal()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+        
+        // View details
+        function viewDetails(id, type) {
+            var modal = document.getElementById('detailsModal');
+            var modalBody = document.getElementById('modalBody');
+            
+            // In production, this would fetch details from server
+            var details = '';
+            
+            if (type === 'url') {
+                details = `
+                    <div class="detail-row">
+                        <div class="detail-label">Log ID:</div>
+                        <div class="detail-value">${id}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Type:</div>
+                        <div class="detail-value">URL Management</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">User:</div>
+                        <div class="detail-value">admin</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Action:</div>
+                        <div class="detail-value">Create URL</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">URL Name:</div>
+                        <div class="detail-value">Main API</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Details:</div>
+                        <div class="detail-value">Created new URL: Main API (192.168.1.100:443/health)</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Timestamp:</div>
+                        <div class="detail-value">2024-03-12 10:30:22</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">IP Address:</div>
+                        <div class="detail-value">192.168.1.100</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Old Value:</div>
+                        <div class="detail-value"><span class="old">-</span></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">New Value:</div>
+                        <div class="detail-value"><span class="new">Main API|api-server-01|192.168.1.100|443|/health|active</span></div>
+                    </div>
+                `;
+            } else if (type === 'activity') {
+                details = `
+                    <div class="detail-row">
+                        <div class="detail-label">Log ID:</div>
+                        <div class="detail-value">${id}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Type:</div>
+                        <div class="detail-value">User Activity</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">User:</div>
+                        <div class="detail-value">admin</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Action:</div>
+                        <div class="detail-value">Login</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Status:</div>
+                        <div class="detail-value"><span class="status-badge success">Success</span></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">IP Address:</div>
+                        <div class="detail-value">192.168.1.100</div>
+                    </div>
+                `;
+            } else if (type === 'maintenance') {
+                details = `
+                    <div class="detail-row">
+                        <div class="detail-label">Log ID:</div>
+                        <div class="detail-value">${id}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Type:</div>
+                        <div class="detail-value">User Maintenance</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Initiator:</div>
+                        <div class="detail-value">admin</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Target:</div>
+                        <div class="detail-value">jsmith</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Action:</div>
+                        <div class="detail-value">Role Change</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Field:</div>
+                        <div class="detail-value">Role</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Old Value:</div>
+                        <div class="detail-value"><span class="old">User</span></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">New Value:</div>
+                        <div class="detail-value"><span class="new">User Admin</span></div>
+                    </div>
+                `;
+            } else {
+                details = `
+                    <div class="detail-row">
+                        <div class="detail-label">Log ID:</div>
+                        <div class="detail-value">${id}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Type:</div>
+                        <div class="detail-value">Parameter Change</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">User:</div>
+                        <div class="detail-value">admin</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Module:</div>
+                        <div class="detail-value">System Settings</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Parameter:</div>
+                        <div class="detail-value">Ping Interval</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Old Value:</div>
+                        <div class="detail-value"><span class="old">5 minutes</span></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">New Value:</div>
+                        <div class="detail-value"><span class="new">3 minutes</span></div>
+                    </div>
+                `;
+            }
+            
+            modalBody.innerHTML = details;
+            modal.classList.add('show');
+        }
+        
+        function hideModal() {
+            document.getElementById('detailsModal').classList.remove('show');
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            var modal = document.getElementById('detailsModal');
+            if (event.target == modal) {
+                hideModal();
+            }
+        }
+        
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.transition = 'opacity 0.5s';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 500);
+            });
+        }, 5000);
+    </script>
+}

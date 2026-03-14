@@ -1,0 +1,150 @@
+@page
+@model ReportsModel
+@{
+    ViewData["Title"] = "Reports";
+    Layout = "_SystemAdminLayout";
+}
+
+<link rel="stylesheet" href="~/css/admin/reports.css" />
+
+<div class="reports-container">
+    <!-- Header -->
+    <div class="header-section">
+        <div class="header-title">
+            <h1><i class="fas fa-chart-bar"></i> Reports</h1>
+            <p>Generate and view system reports</p>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success" style="padding: 12px 15px; border-radius: 5px; margin-bottom: 20px; background: #d4edda; color: #155724;">
+            <i class="fas fa-check-circle"></i> @Model.SuccessMessage
+        </div>
+    }
+    
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger" style="padding: 12px 15px; border-radius: 5px; margin-bottom: 20px; background: #f8d7da; color: #721c24;">
+            <i class="fas fa-exclamation-circle"></i> @Model.ErrorMessage
+        </div>
+    }
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <form method="get">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>Start Date</label>
+                    <input type="date" name="Filter.StartDate" class="filter-control" 
+                           value="@(Model.Filter?.StartDate?.ToString("yyyy-MM-dd"))" />
+                </div>
+                
+                <div class="filter-group">
+                    <label>End Date</label>
+                    <input type="date" name="Filter.EndDate" class="filter-control" 
+                           value="@(Model.Filter?.EndDate?.ToString("yyyy-MM-dd"))" />
+                </div>
+                
+                <div class="filter-group">
+                    <label>Format</label>
+                    <select name="Filter.Format" class="filter-control">
+                        <option value="excel" selected="@(Model.Filter?.Format == "excel")">Excel (.xlsx)</option>
+                        <option value="pdf" selected="@(Model.Filter?.Format == "pdf")">PDF (.pdf)</option>
+                        <option value="csv" selected="@(Model.Filter?.Format == "csv")">CSV (.csv)</option>
+                    </select>
+                </div>
+                
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Reports Grid -->
+    <div class="reports-grid" id="reportsGrid">
+        <!-- Reports will be loaded here dynamically -->
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Load reports via AJAX
+        $(document).ready(function() {
+            loadReports();
+        });
+
+        function loadReports() {
+            // In production, this would fetch from API
+            // For now, render static content
+            var reportsGrid = document.getElementById('reportsGrid');
+            
+            var reports = [
+                { id: 'user_activity', name: 'User Activity Report', desc: 'Detailed log of user logins, logouts, and failed attempts', category: 'Activity', icon: 'fa-users', lastGen: '2024-03-08' },
+                { id: 'user_maintenance', name: 'User Maintenance Report', desc: 'Changes made to user accounts', category: 'Maintenance', icon: 'fa-tools', lastGen: '2024-03-07' },
+                { id: 'access_role', name: 'Access Role Report', desc: 'List of roles and permissions', category: 'Security', icon: 'fa-shield-alt', lastGen: '2024-03-06' },
+                { id: 'active_users', name: 'Active Users Report', desc: 'Currently active users', category: 'Activity', icon: 'fa-user-check', lastGen: '2024-03-09' },
+                { id: 'password_exceptions', name: 'Password Exception Report', desc: 'Password retry attempts and lockouts', category: 'Security', icon: 'fa-key', lastGen: '2024-03-08' },
+                { id: 'audit_trail', name: 'Audit Trail Report', desc: 'Complete audit trail', category: 'Audit', icon: 'fa-history', lastGen: '2024-03-08' },
+                { id: 'parameter_changes', name: 'Parameter Changes Report', desc: 'Changes to system parameters', category: 'Audit', icon: 'fa-sliders-h', lastGen: null },
+                { id: 'dormant_accounts', name: 'Dormant Accounts Report', desc: 'Accounts inactive for 30+ days', category: 'Maintenance', icon: 'fa-user-clock', lastGen: '2024-03-02' }
+            ];
+            
+            var html = '';
+            reports.forEach(function(report) {
+                html += `
+                    <div class="report-card">
+                        <div class="report-header">
+                            <div class="report-icon">
+                                <i class="fas ${report.icon}"></i>
+                            </div>
+                            <div class="report-title">
+                                <h3>${report.name}</h3>
+                                <p>${report.desc}</p>
+                            </div>
+                        </div>
+                        <div class="report-body">
+                            <div class="report-meta">
+                                <span class="report-category">${report.category}</span>
+                                ${report.lastGen ? 
+                                    `<span class="report-last-generated"><i class="far fa-clock"></i> ${report.lastGen}</span>` : 
+                                    `<span class="report-last-generated text-muted">Never generated</span>`
+                                }
+                            </div>
+                            <div class="report-actions">
+                                <button class="btn btn-success" onclick="generateReport('${report.id}', 'excel')">
+                                    <i class="fas fa-file-excel"></i> Excel
+                                </button>
+                                <button class="btn btn-danger" onclick="generateReport('${report.id}', 'pdf')">
+                                    <i class="fas fa-file-pdf"></i> PDF
+                                </button>
+                                <button class="btn btn-info" onclick="generateReport('${report.id}', 'csv')">
+                                    <i class="fas fa-file-csv"></i> CSV
+                                </button>
+                                <button class="btn btn-warning" onclick="previewReport('${report.id}')">
+                                    <i class="fas fa-eye"></i> Preview
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            reportsGrid.innerHTML = html;
+        }
+
+        function generateReport(reportId, format) {
+            alert(`Generating ${reportId} report in ${format} format...`);
+            // In production, this would call the server
+        }
+
+        function previewReport(reportId) {
+            alert(`Previewing ${reportId} report...`);
+            // In production, this would show a modal with preview
+        }
+    </script>
+}

@@ -1,0 +1,226 @@
+@page
+@model UserListModel
+@{
+    ViewData["Title"] = "User List";
+    Layout = "_UserAdminLayout";
+}
+
+<link rel="stylesheet" href="~/css/useradmin/userlist.css" />
+
+<div class="user-list-container">
+    <!-- Header -->
+    <div class="header-section">
+        <div class="header-title">
+            <h1><i class="fas fa-users"></i> User Management</h1>
+            <p>View and manage regular users and LGU accounts</p>
+        </div>
+        <a href="/UserAdmin/AddUser" class="add-btn">
+            <i class="fas fa-user-plus"></i> Add New User
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <input type="text" class="search-box" id="searchInput" placeholder="Search by name, username, or email..." />
+        <select class="filter-select" id="roleFilter">
+            <option value="all">All Roles</option>
+            <option value="User">Regular User</option>
+            <option value="LGU">LGU User</option>
+        </select>
+        <select class="filter-select" id="statusFilter">
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="locked">Locked</option>
+            <option value="dormant">Dormant</option>
+        </select>
+        <button class="filter-btn" onclick="applyFilters()">
+            <i class="fas fa-filter"></i> Apply Filters
+        </button>
+    </div>
+
+    <!-- Users Table -->
+    <div class="table-responsive">
+        <table class="user-table" id="userTable">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th>Department</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Users != null && Model.Users.Any())
+                {
+                    @foreach (var user in Model.Users)
+                    {
+                        <tr data-role="@user.Role" data-status="@user.Status">
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="user-avatar">@user.FirstName[0]@user.LastName[0]</div>
+                                    <span>@user.FirstName @user.LastName</span>
+                                </div>
+                            </td>
+                            <td>@user.Username</td>
+                            <td>@user.Email</td>
+                            <td>
+                                <span class="role-badge @user.Role.ToLower()">
+                                    @(user.Role == "LGU" ? "LGU User" : "Regular User")
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge @user.Status">
+                                    @(user.Status == "active" ? "Active" :
+                                      user.Status == "inactive" ? "Inactive" :
+                                      user.Status == "locked" ? "Locked" : "Dormant")
+                                </span>
+                            </td>
+                            <td>
+                                @if (user.LastLogin.HasValue)
+                                {
+                                    @user.LastLogin.Value.ToString("yyyy-MM-dd HH:mm")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Never</span>
+                                }
+                            </td>
+                            <td>@(user.Department ?? "-")</td>
+                            <td>
+                                <div class="action-menu">
+                                    <button class="action-btn" onclick="toggleMenu(@user.Id)">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <div class="dropdown-menu" id="menu-@user.Id">
+                                        <a href="/UserAdmin/AddUser?id=@user.Id" class="dropdown-item">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <button class="dropdown-item" onclick="resetPassword(@user.Id)">
+                                            <i class="fas fa-key"></i> Reset Password
+                                        </button>
+                                        <button class="dropdown-item" onclick="toggleStatus(@user.Id)">
+                                            <i class="fas @(user.Status == "active" ? "fa-ban" : "fa-check")"></i>
+                                            @(user.Status == "active" ? "Suspend" : "Activate")
+                                        </button>
+                                        @if (user.Status == "locked")
+                                        {
+                                            <button class="dropdown-item" onclick="unlockUser(@user.Id)">
+                                                <i class="fas fa-lock-open"></i> Unlock
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="no-data">
+                            <i class="fas fa-users"></i>
+                            <h3>No Users Found</h3>
+                            <p>Click "Add New User" to create your first user.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        
+        <!-- Pagination -->
+        <div class="pagination">
+            <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">4</button>
+            <button class="page-btn">5</button>
+            <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Toggle dropdown menu
+        function toggleMenu(userId) {
+            var menu = document.getElementById('menu-' + userId);
+            menu.classList.toggle('show');
+            
+            // Close other menus
+            document.querySelectorAll('.dropdown-menu').forEach(function(m) {
+                if (m.id !== 'menu-' + userId) {
+                    m.classList.remove('show');
+                }
+            });
+        }
+        
+        // Close menus when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.closest('.action-menu')) {
+                document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
+                    menu.classList.remove('show');
+                });
+            }
+        }
+        
+        // Reset password
+        function resetPassword(id) {
+            if (confirm('Send password reset email to this user?')) {
+                alert('Password reset email sent successfully!');
+                // In production, this would call the server
+            }
+        }
+        
+        // Toggle status (suspend/activate)
+        function toggleStatus(id) {
+            var action = event.target.innerText.includes('Suspend') ? 'suspend' : 'activate';
+            if (confirm('Are you sure you want to ' + action + ' this user?')) {
+                alert('User ' + action + 'd successfully!');
+                // In production, this would call the server
+            }
+        }
+        
+        // Unlock user
+        function unlockUser(id) {
+            if (confirm('Unlock this user account?')) {
+                alert('User unlocked successfully!');
+                // In production, this would call the server
+            }
+        }
+        
+        // Search and filter
+        function applyFilters() {
+            var searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            var roleFilter = document.getElementById('roleFilter').value;
+            var statusFilter = document.getElementById('statusFilter').value;
+            var rows = document.querySelectorAll('#userTable tbody tr');
+            
+            rows.forEach(function(row) {
+                var text = row.textContent.toLowerCase();
+                var role = row.getAttribute('data-role');
+                var status = row.getAttribute('data-status');
+                
+                var matchesSearch = searchTerm === '' || text.indexOf(searchTerm) > -1;
+                var matchesRole = roleFilter === 'all' || role === roleFilter;
+                var matchesStatus = statusFilter === 'all' || status === statusFilter;
+                
+                if (matchesSearch && matchesRole && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        // Live search as you type
+        document.getElementById('searchInput').addEventListener('keyup', applyFilters);
+        document.getElementById('roleFilter').addEventListener('change', applyFilters);
+        document.getElementById('statusFilter').addEventListener('change', applyFilters);
+    </script>
+}

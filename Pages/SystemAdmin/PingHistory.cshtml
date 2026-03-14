@@ -1,0 +1,208 @@
+@page
+@model PingHistoryModel
+@{
+    ViewData["Title"] = "Ping History";
+    Layout = "_SystemAdminLayout";
+}
+
+<link rel="stylesheet" href="~/css/admin/ping-history.css" />
+
+<div class="ping-history-container">
+    <!-- Header -->
+    <div class="header-section">
+        <div class="header-title">
+            <h1><i class="fas fa-history"></i> Ping History</h1>
+            <p>View and analyze all ping results</p>
+        </div>
+        <form method="post" asp-page-handler="Export">
+            <button type="submit" class="export-btn">
+                <i class="fas fa-download"></i> Export to Excel
+            </button>
+        </form>
+    </div>
+
+    <!-- Success Message -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Pings</h3>
+            <div class="stat-value">@Model.TotalPings</div>
+        </div>
+        <div class="stat-card">
+            <h3>Successful</h3>
+            <div class="stat-value success">@Model.SuccessPings</div>
+        </div>
+        <div class="stat-card">
+            <h3>Errors</h3>
+            <div class="stat-value error">@Model.ErrorPings</div>
+        </div>
+        <div class="stat-card">
+            <h3>Timeouts</h3>
+            <div class="stat-value warning">@Model.TimeoutPings</div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <form method="get">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label>Search</label>
+                    <input type="text" 
+                           name="SearchTerm" 
+                           class="filter-control" 
+                           placeholder="Search by URL or error message..."
+                           value="@Model.SearchTerm" />
+                </div>
+                
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select name="StatusFilter" class="filter-control">
+                        <option value="all">All Status</option>
+                        <option value="success" selected="@(Model.StatusFilter == "success")">Success</option>
+                        <option value="error" selected="@(Model.StatusFilter == "error")">Error</option>
+                        <option value="timeout" selected="@(Model.StatusFilter == "timeout")">Timeout</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>URL</label>
+                    <select name="UrlFilter" class="filter-control">
+                        <option value="all">All URLs</option>
+                        @if (Model.UniqueUrls != null)
+                        {
+                            @foreach (var url in Model.UniqueUrls)
+                            {
+                                <option value="@url" selected="@(Model.UrlFilter == url)">@url</option>
+                            }
+                        }
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Start Date</label>
+                    <input type="date" 
+                           name="StartDate" 
+                           class="filter-control" 
+                           value="@(Model.StartDate?.ToString("yyyy-MM-dd"))" />
+                </div>
+                
+                <div class="filter-group">
+                    <label>End Date</label>
+                    <input type="date" 
+                           name="EndDate" 
+                           class="filter-control" 
+                           value="@(Model.EndDate?.ToString("yyyy-MM-dd"))" />
+                </div>
+                
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Apply
+                    </button>
+                    <a href="@Url.Page("PingHistory", "ClearFilters")" class="btn btn-warning">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Table -->
+    <div class="table-responsive">
+        @if (Model.PingResults != null && Model.PingResults.Any())
+        {
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>URL Name</th>
+                        <th>Status</th>
+                        <th>Response Time</th>
+                        <th>Status Code</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ping in Model.PingResults)
+                    {
+                        <tr>
+                            <td>@ping.Date</td>
+                            <td>@ping.Time</td>
+                            <td>@ping.UrlName</td>
+                            <td>
+                                <span class="status-badge @ping.Status">
+                                    @(ping.Status == "success" ? "Success" : 
+                                      ping.Status == "error" ? "Error" : "Timeout")
+                                </span>
+                            </td>
+                            <td>
+                                @if (ping.ResponseTime.HasValue)
+                                {
+                                    @(ping.ResponseTime) <span>ms</span>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td>@(ping.StatusCode.HasValue ? ping.StatusCode.ToString() : "-")</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(ping.ErrorMessage))
+                                {
+                                    <span class="text-danger">@ping.ErrorMessage</span>
+                                }
+                                else
+                                {
+                                    <span class="text-success">OK</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">4</button>
+                <button class="page-btn">5</button>
+                <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        }
+        else
+        {
+            <div class="no-data">
+                <i class="fas fa-info-circle"></i>
+                <h3>No Ping Results Found</h3>
+                <p>Try adjusting your filters or run some ping tests first.</p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.transition = 'opacity 0.5s';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 500);
+            });
+        }, 5000);
+    </script>
+}

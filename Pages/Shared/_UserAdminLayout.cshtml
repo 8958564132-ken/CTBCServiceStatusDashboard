@@ -1,0 +1,94 @@
+@using System.Security.Claims
+@{
+    Layout = "_Layout";
+}
+
+<link rel="stylesheet" href="~/css/useradmin/layout.css" />
+
+<div class="admin-wrapper">
+    <!-- Sidebar -->
+    <div class="admin-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>User Admin</h3>
+            <p>Service Status Dashboard</p>
+        </div>
+        
+        <div class="sidebar-nav">
+            <ul class="nav-item">
+                <li>
+                    <a href="/UserAdmin/Dashboard" class="nav-link @(ViewContext.RouteData.Values["page"].ToString().Contains("Dashboard") ? "active" : "")">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                
+                <li class="nav-section">
+    <div class="nav-section-title">USER MANAGEMENT</div>
+</li>
+<li>
+    <a href="/UserAdmin/UserList" class="nav-link @(ViewContext.RouteData.Values["page"].ToString().Contains("UserList") ? "active" : "")">
+        <i class="fas fa-users"></i>
+        <span>Users</span>
+    </a>
+</li>
+<li>
+    <a href="/UserAdmin/AddUser" class="nav-link @(ViewContext.RouteData.Values["page"].ToString().Contains("AddUser") ? "active" : "")">
+        <i class="fas fa-user-plus"></i>
+        <span>Add User</span>
+    </a>
+</li>
+<li>
+    <a href="/UserAdmin/RoleManagement" class="nav-link @(ViewContext.RouteData.Values["page"].ToString().Contains("RoleManagement") ? "active" : "")">
+        <i class="fas fa-shield-alt"></i>
+        <span>Roles</span>
+    </a>
+</li>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="admin-content">
+        <div class="admin-header">
+            <div style="display: flex; align-items: center;">
+                <button class="toggle-sidebar" id="toggleSidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">@ViewData["Title"]</h1>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-details">
+                    <div class="user-name">@(User.FindFirst("FullName")?.Value ?? "User")</div>
+                    <div class="user-role">@(User.FindFirst(ClaimTypes.Role)?.Value ?? "Guest")</div>
+                </div>
+                <div class="user-avatar">
+                    @{
+                        var fullName = User.FindFirst("FullName")?.Value;
+                        var initial = !string.IsNullOrEmpty(fullName) && fullName.Length > 0 
+                            ? fullName.Substring(0, 1) 
+                            : "U";
+                    }
+                    @initial
+                </div>
+
+                <a href="/Logout" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+            </div>
+        </div>
+        
+        <div class="admin-body">
+            @RenderBody()
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('toggleSidebar').addEventListener('click', function() {
+        document.getElementById('sidebar').classList.toggle('collapsed');
+    });
+</script>
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}

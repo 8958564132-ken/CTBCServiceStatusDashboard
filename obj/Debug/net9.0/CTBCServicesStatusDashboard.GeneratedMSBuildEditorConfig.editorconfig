@@ -1,0 +1,115 @@
+is_global = true
+build_property.TargetFramework = net9.0
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v9.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = CTBCServicesStatusDashboard
+build_property.RootNamespace = CTBCServicesStatusDashboard
+build_property.ProjectDir = C:\Users\PC\OneDrive\Documents\OJT\CTBCServiceStatusDashboard\CTBCServiceStatusDashboard\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 9.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\PC\OneDrive\Documents\OJT\CTBCServiceStatusDashboard\CTBCServiceStatusDashboard
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 9.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/LGU/Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTEdVXERhc2hib2FyZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/LGU/Projects.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTEdVXFByb2plY3RzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/LGU/Remittance.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTEdVXFJlbWl0dGFuY2UuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/Logout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9nb3V0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/Shared/_LguLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9MZ3VMYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/Shared/_SystemAdminLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9TeXN0ZW1BZG1pbkxheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/Shared/_UserAdminLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9Vc2VyQWRtaW5MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/SystemAdmin/AuditLogs.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3lzdGVtQWRtaW5cQXVkaXRMb2dzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/SystemAdmin/Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3lzdGVtQWRtaW5cRGFzaGJvYXJkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/SystemAdmin/PingHistory.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3lzdGVtQWRtaW5cUGluZ0hpc3RvcnkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/SystemAdmin/Reports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3lzdGVtQWRtaW5cUmVwb3J0cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/SystemAdmin/SystemSettings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3lzdGVtQWRtaW5cU3lzdGVtU2V0dGluZ3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/SystemAdmin/UrlManagement.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3lzdGVtQWRtaW5cVXJsTWFuYWdlbWVudC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/UserAdmin/AddUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlckFkbWluXEFkZFVzZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/UserAdmin/Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlckFkbWluXERhc2hib2FyZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/UserAdmin/RoleManagement.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlckFkbWluXFJvbGVNYW5hZ2VtZW50LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/UserAdmin/UserList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlckFkbWluXFVzZXJMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/OneDrive/Documents/OJT/CTBCServiceStatusDashboard/CTBCServiceStatusDashboard/Pages/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
